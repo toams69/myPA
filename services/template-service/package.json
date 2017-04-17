@@ -1,0 +1,18 @@
+{
+  "name": "tpl-alfred-service",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "start": "node ./server.js"
+  },
+  "engines": {
+    "node": "7.4.0",
+    "npm": "4.0.5"
+  },
+  "devDependencies": {
+    
+  },
+  "dependencies": {
+    "ws": "^1.1.1"
+  }
+}

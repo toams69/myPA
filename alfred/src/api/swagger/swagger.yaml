@@ -1,0 +1,77 @@
+swagger: '2.0'
+info:
+  title: Alfred API
+  description: Alfred API
+  version: "1.0.0"
+schemes:
+  - http
+basePath: /alfred-api
+consumes:
+  - application/json
+produces:
+  - application/json
+paths:      
+  /current-user:
+    get:
+      x-swagger-router-controller: user
+      summary: get the current user if authenticated.
+      description: |
+        This request returns all necessary information about the current user.
+      responses:
+        200:
+         description: Request succeeded.
+         schema:
+            $ref: '#/definitions/apiSuccessResponse'
+        500:
+          description: Request failed.
+          schema:
+            $ref: '#/definitions/apiErrorResponse'
+  /message:
+    post:
+      x-swagger-router-controller: message
+      operationId: proceedMessage
+      tags: ['message']
+      summary: Handle a message and try to help the user
+      
+      parameters:
+        - name: parameters
+          in: body
+          description: Request parameters.
+          required: true
+          schema:
+            required:
+              - msg
+            properties:
+              msg:
+                type: string
+      responses:
+        200: 
+          description: Request succeeded.
+          schema:
+            $ref: '#/definitions/apiSuccessResponse'
+        500:
+          description: Request failed.
+          schema:
+            $ref: '#/definitions/apiErrorResponse'
+            
+definitions:    
+  apiSuccessResponse:
+    type: object
+    required:
+      - statusCode
+    properties:
+      statusCode:
+        type: integer
+        description: On success will have a vaue of zero.
+        
+  apiErrorResponse:
+    type: object
+    required:
+      - statusCode
+    properties:
+      statusCode:
+        type: integer
+        description: On error will provide a code that can be used to get more detail about the error.
+      statusMessage:
+        type: string
+        description: On error will provide a message with more detail about the error. Keep in mind that the error message will be fairly general and internal details are not exposed.

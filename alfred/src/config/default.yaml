@@ -1,0 +1,11 @@
+admin:
+  username: ops
+  # encrypted password
+  password: $2a$10$7.jOOym2GhhVtpSPXOQmweVqY4gLKOXFbNDRul7UMeP40kQVVx/au
+
+common:
+  clientId: internal_api_client
+  clientSecret: secret
+
+services:
+    auth: http://auth:4444

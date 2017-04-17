@@ -1,0 +1,16 @@
+{
+    "compilerOptions": {
+		"module": "commonjs",
+		"noLib":false,
+		"target": "es6",
+		"sourceMap": true,
+        "outDir": "target/build",
+        "moduleResolution": "node",
+        "baseUrl": "./src",
+        "noUnusedLocals": true,
+        "noImplicitAny": false
+    },
+    "include": [
+	  	"src/**/*.ts", "src/**/*.d.ts"
+    ]
+}

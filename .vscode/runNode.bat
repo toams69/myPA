@@ -1,0 +1,6 @@
+SET ALFRED_SESSION_ENABLE_CLEANUP=false
+SET ALFRED_SERVER_PORT=5555
+SET ALFRED_CORS_ENABLE=true
+SET ALFRED_SERVICES_AUTH=http://localhost:4444
+REM call grunt build
+call node %* | bunyan -o short

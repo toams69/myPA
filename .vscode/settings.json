@@ -1,0 +1,3 @@
+{
+    "typescript.tsdk": "./alfred/node_modules/typescript/lib"
+}

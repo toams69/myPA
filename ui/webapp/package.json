@@ -1,0 +1,38 @@
+{
+  "name": "webapp",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "start": "node ./app/bin/www"
+  },
+  "engines": {
+    "node": "7.4.0",
+    "npm": "4.0.5"
+  },
+  "devDependencies": {
+    "babel-core": "*",
+    "babel-loader": "*",
+    "react-hot-loader": "*",
+    "babel-preset-es2015": "*",
+    "babel-preset-react": "*",
+    "babel-preset-react-hmre": "*",
+    "webpack": "*",
+    "webpack-dev-middleware": "*",
+    "webworkify-webpack": "*",
+    "transform-loader": "*",
+    "webpack-dev-server": "*",
+    "webpack-hot-middleware": "*"
+  },
+  "dependencies": {
+    "assets-webpack-plugin": "*",
+    "babel": "^6.23.0",
+    "babel-preset-stage-1": "^6.1.18",
+    "body-parser": "~1.13.2",
+    "express": "~4.13.1",
+    "react": "*",
+    "react-dom": "*",
+    "react-redux": "*",
+    "react-router": "*",
+    "redux": "*"
+  }
+}

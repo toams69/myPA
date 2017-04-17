@@ -1,0 +1,4 @@
+{
+    "version":"<%= version %>",
+    "changeset": "<%= changeset %>"
+}

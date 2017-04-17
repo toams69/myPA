@@ -1,0 +1,12 @@
+[
+    {
+        "operationId": "getWeather",
+        "requests": [
+            "Quelle est la météo"
+        ],
+        "answers": [
+            "Il fait plutot <%= result %> aujourd'hui",
+            "Le temps sera <%= result %> aujourd'hui"
+        ]
+    }
+]

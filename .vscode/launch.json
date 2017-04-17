@@ -1,0 +1,55 @@
+{
+    "version": "0.2.0",
+    "configurations": [{
+            "timeout": 300000,
+            "name": "Launch",
+            "type": "node",
+            "request": "launch",
+            "program": "${workspaceRoot}/alfred/src/app.ts",
+            "stopOnEntry": false,
+            "args": ["--conf=./dev.yaml"],
+            "cwd": "${workspaceRoot}",
+            "preLaunchTask": null,
+            "runtimeExecutable": "${workspaceRoot}/.vscode/runNode.bat",
+            "runtimeArgs": [
+                "--nolazy"
+            ],
+            "env": {
+                "NODE_ENV": "development"
+            },
+            "console": "internalConsole",
+            "sourceMaps": true,
+            "outFiles": [
+                "${workspaceRoot}/alfred/target/build/**/*.js",
+                "${workspaceRoot}/alfred/target/build/**/*.map"
+            ]
+        },
+        {
+            "name": "Attach",
+            "type": "node",
+            "request": "attach",
+            "port": 5858,
+            "address": "localhost",
+            "restart": false,
+            "sourceMaps": true,
+            "outFiles": [
+                "${workspaceRoot}/alfred/target/build/**/*.js",
+                "${workspaceRoot}/alfred/target/build/**/*.map"
+            ],
+            "localRoot": "${workspaceRoot}",
+            "remoteRoot": null
+        },
+        {
+            "name": "Attach to Process",
+            "type": "node",
+            "request": "attach",
+            "processId": "${command.PickProcess}",
+            "port": 5858,
+            "sourceMaps": true,
+            "outFiles": [
+                "${workspaceRoot}/alfred/target/build/**/*.js",
+                "${workspaceRoot}/alfred/target/build/**/*.map"
+            ]
+        }
+    ]
+}
