@@ -219,35 +219,36 @@ export const startApp = (conf: ConfigInterface): Promise<HttpServer | HttpsServe
 
 // Trying to connect to multiple ioServer
 
-// import * as WebSocket  from 'ws';
+import * as WebSocket  from 'ws';
 
 
-// interface ServiceSocketInterface {
-//   socket:     any;
-//   service: string;
-// }
+interface ServiceSocketInterface {
+  socket:     any;
+  service: string;
+}
 
-// class ServiceSocket implements ServiceSocketInterface {
-//   socket: any = null;
-//   service: string = '';
-//   constructor(socket: any, service: string) {
-//     this.socket = socket;
-//     this.service = service;
-//   }
-// }
+class ServiceSocket implements ServiceSocketInterface {
+  socket: any = null;
+  service: string = '';
+  constructor(socket: any, service: string) {
+    this.socket = socket;
+    this.service = service;
+  }
+}
 
-// const createAPIServiceConnection = (service: string, url: string) : ServiceSocket => {
-//   console.log('trying to connect to service: ' + service);
-//   const socket = new WebSocket(url);
-//   socket.on('open', function() : void {
-//     console.log('connected on service: ' + service);
-//   });
-//   socket.on('close', function() : void {
-//     console.log('service: ' + service + ' lost');
-//   });
-//   return new ServiceSocket(socket, service);
-// };
+const createAPIServiceConnection = (service: string, url: string) : ServiceSocket => {
+  log.info('trying to connect to service: ' + service);
+  const socket = new WebSocket(url);
+  socket.on('open', function() : void {
+    log.info('connected on service: ' + service);
+  });
+  socket.on('close', function() : void {
+    log.info('service: ' + service + ' lost');
+  });
+  return new ServiceSocket(socket, service);
+};
 
+const sockets = new Array<ServiceSocket>();
 const client = redis.createClient();
 client.publish('__alfred_channel', 'Ready.');
 client.on('ready', () => {
@@ -259,7 +260,7 @@ client.on('message', (channel, message) => {
       const obj = JSON.parse(message);
       switch (obj.type) {
         case 'addService' :
-          log.info('a new service as been registered');
+          sockets.push(createAPIServiceConnection(obj.name, 'ws://localhost:' + obj.port));
           break;
         default:
           log.info('unknow message type');
@@ -269,9 +270,6 @@ client.on('message', (channel, message) => {
     }
 });
 
-// const sockets = new Array<ServiceSocket>();
-//sockets.push(createAPIServiceConnection('service1', 'ws://localhost:3000'));
-//sockets.push(createAPIServiceConnection('service2', 'ws://localhost:3001'));
 
 if (require.main === module) {
   startApp(conf);
