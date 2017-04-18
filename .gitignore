@@ -22,6 +22,9 @@ lib-cov
 node_modules/
 jspm_packages/
 
+# Generated files
+alfred/target/
+
 # Typescript v1 declaration files
 typings/
 
