@@ -39,6 +39,7 @@
     "nconf": "^0.8.4",
     "nconf-yaml": "^1.0.2",
     "optimist": "^0.6.1",
+    "redis": "^2.7.1",
     "socket.io-client": "^1.7.3",
     "swagger-express-mw": "^0.7.0",
     "swagger-tools": "^0.10.1",

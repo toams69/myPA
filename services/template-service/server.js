@@ -2,9 +2,11 @@ const WebSocketServer   = require('ws').Server;
 const fs                = require('fs');
 const path              = require('path');
 const controller        = require('./controller');
+const product           = require('./package.json');
+const redis             = require('redis');
 
 const options = {
-    port: 3000
+    ports: [3000, 3001, 3002]
 };
 
 var walk = function(dir, filelist) {
@@ -59,32 +61,74 @@ const proceedRequest = (message, uuid, ws) => {
     }
 };
 
-const server = new WebSocketServer({port: options.port});
-console.info(`Listening on ${options.port}`);
-const subscribers = new Set();
+let server = null;
+let index = 0;
 
-server.on('connection', (ws) => {
-    console.log('<-> New connection to service.');
-    subscribers.add(ws);
+const createWebSocketServer = (port) => {
+    server = new WebSocketServer({port: port});
 
-    ws.on('close', () => {
-        console.log('<X> Connection lost.');
-        subscribers.delete(ws);
+    server.on('listening', (err) => {
+        console.info(`Listening on ${port}`);
+        startBinding(server);
     });
 
-    ws.on('message', (message) => {
-        try {
-            JSON.parse(message);
-            if (message.uuid) {
-                console.log("<- ["+uuid+"]" + message);
-                proceedRequest(message.txt, message.uuid, ws);
+    server.on('error', (err) => {
+        if (index < options.ports.length) {
+            index++;
+            createWebSocketServer(options.ports[index]);
+        } else {
+            if (!server) {
+                console.log("Can't start webserver");
+                throw "no available port";
             }
-        } catch (e) {
-           
         }
     });
-});
+}
 
-/* Initiate connection to the aggregator core :) */
+const startBinding = (server) => {
+    const subscribers = new Set();
+    const client = redis.createClient();
+    server.on('connection', (ws) => {
+        console.log('<-> New connection to service.');
+        subscribers.add(ws);
 
-proceedRequest("Quelle est la météo", 12345, {});
+        ws.on('close', () => {
+            console.log('<X> Connection lost.');
+            subscribers.delete(ws);
+        });
+
+        ws.on('message', (message) => {
+            try {
+                JSON.parse(message);
+                if (message.uuid) {
+                    console.log("<- ["+uuid+"]" + message);
+                    proceedRequest(message.txt, message.uuid, ws);
+                }
+            } catch (e) {
+            
+            }
+        });
+    });
+
+    const publish = (c) => {
+        console.log('-> publish service to redis');
+        c.publish('__services_channel', JSON.stringify({
+            type:       'addService',
+            name:       product.name,
+            ws:         true,
+            port:       options.ports[index],
+            version:    product.version
+        }));
+        c.quit();
+    };
+    client.on('message', (channel, message) => {
+        setTimeout(() => publish(redis.createClient()), 500)
+    });
+    client.on('ready', () => {
+        client.subscribe('__alfred_channel');
+    });
+    publish(redis.createClient());
+}
+
+// Start the listening
+createWebSocketServer(options.ports[index]);

@@ -31,6 +31,7 @@ import {ConfigInterface}            from 'conf/Config';
 import * as conf                    from 'conf/configuration';
 // import * as contextMiddleware       from 'context/context-middleware';
 import * as logger                  from 'logger';
+import * as redis                   from 'redis';
 
 const log = logger.child({from: 'app'});
 // passportConfig(passport);
@@ -218,41 +219,59 @@ export const startApp = (conf: ConfigInterface): Promise<HttpServer | HttpsServe
 
 // Trying to connect to multiple ioServer
 
-import * as WebSocket  from 'ws';
+// import * as WebSocket  from 'ws';
 
 
-interface ServiceSocketInterface {
-  socket:     any;
-  service: string;
-}
+// interface ServiceSocketInterface {
+//   socket:     any;
+//   service: string;
+// }
 
-class ServiceSocket implements ServiceSocketInterface {
-  socket: any = null;
-  service: string = '';
-  constructor(socket: any, service: string) {
-    this.socket = socket;
-    this.service = service;
-  }
-}
+// class ServiceSocket implements ServiceSocketInterface {
+//   socket: any = null;
+//   service: string = '';
+//   constructor(socket: any, service: string) {
+//     this.socket = socket;
+//     this.service = service;
+//   }
+// }
 
-const createAPIServiceConnection = (service: string, url: string) : ServiceSocket => {
-  console.log('trying to connect to service: ' + service);
-  const socket = new WebSocket(url);
-  socket.on('open', function() : void {
-    console.log('connected on service: ' + service);
-  });
-  socket.on('close', function() : void {
-    console.log('service: ' + service + ' lost');
-  });
-  return new ServiceSocket(socket, service);
-};
+// const createAPIServiceConnection = (service: string, url: string) : ServiceSocket => {
+//   console.log('trying to connect to service: ' + service);
+//   const socket = new WebSocket(url);
+//   socket.on('open', function() : void {
+//     console.log('connected on service: ' + service);
+//   });
+//   socket.on('close', function() : void {
+//     console.log('service: ' + service + ' lost');
+//   });
+//   return new ServiceSocket(socket, service);
+// };
 
+const client = redis.createClient();
+client.publish('__alfred_channel', 'Ready.');
+client.on('ready', () => {
+    client.subscribe('__services_channel');
+});
+client.on('message', (channel, message) => {
+    log.info('[' + channel + '] <= ' + message);
+    try {
+      const obj = JSON.parse(message);
+      switch (obj.type) {
+        case 'addService' :
+          log.info('a new service as been registered');
+          break;
+        default:
+          log.info('unknow message type');
+      }
+    } catch (e) {
+      log.info('error during parse ' + e);
+    }
+});
 
-const sockets = new Array<ServiceSocket>();
-
-
-sockets.push(createAPIServiceConnection('service1', 'ws://localhost:3000'));
-sockets.push(createAPIServiceConnection('service2', 'ws://localhost:3001'));
+// const sockets = new Array<ServiceSocket>();
+//sockets.push(createAPIServiceConnection('service1', 'ws://localhost:3000'));
+//sockets.push(createAPIServiceConnection('service2', 'ws://localhost:3001'));
 
 if (require.main === module) {
   startApp(conf);
