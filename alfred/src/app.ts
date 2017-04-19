@@ -197,7 +197,11 @@ interface ServiceSocketInterface {
 }
 
 class SearchRequest {
-  
+  uuid: any = "";
+  userId: number = 1;
+  pendingSubRequest: Array<ServiceSocket> = [];
+  eventEmitter: any = new events.EventEmitter();
+  ttl: Date = null;
 }
 
 const searchRequests = new Array<SearchRequest>();
