@@ -101,7 +101,7 @@ const startBinding = (server) => {
             try {
                 JSON.parse(message);
                 if (message.uuid) {
-                    console.log("<- ["+uuid+"]" + message);
+                    console.log("<- ["+message.uuid+"]" + message);
                     proceedRequest(message.txt, message.uuid, ws);
                 }
             } catch (e) {

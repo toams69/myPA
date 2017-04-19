@@ -13,7 +13,6 @@ import * as http                    from 'http';
 import * as https                   from 'https';
 import * as path                    from 'path';
 // import * as passport                from 'passport';
-// import * as socketIO                from 'socket.io';
 import * as SwaggerExpress          from 'swagger-express-mw';
 import * as SwaggerUi               from 'swagger-tools/middleware/swagger-ui';
 // import {adminRouter}                from 'admin-router';
@@ -23,15 +22,13 @@ import * as SwaggerUi               from 'swagger-tools/middleware/swagger-ui';
 // import {expressMiddleware as zkm}   from 'expressMiddleware';
 // import {metricsMiddleware}          from 'metrics/request-metrics';
 // import {sessionManager}             from 'session/session-manager-singleton';
-// import {userSockets}                from 'singleton/user-sockets';
-// import {sessionClient}              from 'singleton/redis-client';
 // import * as userController          from 'api/controllers/user';
 // import * as sessionMiddleware       from 'auth/session-middleware';
 import {ConfigInterface}            from 'conf/Config';
 import * as conf                    from 'conf/configuration';
 // import * as contextMiddleware       from 'context/context-middleware';
 import * as logger                  from 'logger';
-import * as redis                   from 'redis';
+
 
 const log = logger.child({from: 'app'});
 // passportConfig(passport);
@@ -89,24 +86,6 @@ const createExpressApp = (conf: ConfigInterface) => {
   app.set('etag', false);
   app.set('x-powered-by', false);
 
-  // Redis health check.
-  app.use('/alfred-api/*', (request: Request, response: Response, next: (err?: any) => void) => {
-    //let client  = null;//sessionClient.getClient();
-    let baseUrl = request.baseUrl;
-
-    if (baseUrl.startsWith('/alfred-api/explore') || baseUrl.startsWith('/alfred-api/doc')) {
-      next();   
-    } else if (request.method === 'OPTIONS') {
-      response.end();
-    // } else if (client.status !== 'ready') {
-    //   let json = { status: { code: StatusCode.RedisDown, message: 'Redis is unavailable'}};
-    // //   response.apiError = json;
-    //   response.status(503).json(json);
-    } else {
-      next();
-    }
-  });
-
 //   app.use('/alfred-api/login', userController.login);
   
   app.use('/alfred-api/*', (request: Request, response: Response, next: (err?: any) => void) => {
@@ -147,15 +126,6 @@ const createServer = (app, conf: ConfigInterface): HttpServer | HttpsServer => {
     server = http.createServer(app);
   }
 
-//   const io = socketIO(server, {
-//     path: '/wwe/socket.io',
-//     pingTimeout: conf.socketIoPingTimeout,
-//     pingInterval: conf.socketIoPingInterval,
-//     transports: conf.socketIoTransports,
-//     cookie: conf.socketIoCookie
-//   });
-//   userSockets.initialize(io);
-
   return server;
 };
 
@@ -166,13 +136,11 @@ let createSwaggerExpress = (conf: ConfigInterface): Promise<any> => {
   };
 
   return new Promise((resolve, reject) => {
-
     SwaggerExpress.create(config, (err: boolean, swaggerExpress: any): void => {
       if (err) {
         log.error('failed to create swagger app:', err);
         throw err;
       }
-
       resolve(swaggerExpress);
     });
 
@@ -217,9 +185,10 @@ export const startApp = (conf: ConfigInterface): Promise<HttpServer | HttpsServe
 };
 
 
-// Trying to connect to multiple ioServer
+// Trying to connect to multiple ws server
 
 import * as WebSocket  from 'ws';
+import * as events from 'events';
 
 
 interface ServiceSocketInterface {
@@ -227,28 +196,47 @@ interface ServiceSocketInterface {
   service: string;
 }
 
+class SearchRequest {
+  
+}
+
+const searchRequests = new Array<SearchRequest>();
+
 class ServiceSocket implements ServiceSocketInterface {
   socket: any = null;
   service: string = '';
+
+
+
   constructor(socket: any, service: string) {
     this.socket = socket;
     this.service = service;
   }
 }
 
-const createAPIServiceConnection = (service: string, url: string) : ServiceSocket => {
+const sockets = new Array<ServiceSocket>();
+const eventEmitter = new events.EventEmitter();
+
+eventEmitter.on('socketMessageReceived', () => {
+
+});
+
+
+const createAPIServiceConnection = (service: string, url: string) : any => {
   log.info('trying to connect to service: ' + service);
   const socket = new WebSocket(url);
   socket.on('open', function() : void {
     log.info('connected on service: ' + service);
+    sockets.push(new ServiceSocket(socket, service));
   });
   socket.on('close', function() : void {
     log.info('service: ' + service + ' lost');
+    // TODO remove from array of socket
   });
-  return new ServiceSocket(socket, service);
+  return socket;
 };
 
-const sockets = new Array<ServiceSocket>();
+import * as redis  from 'redis';
 const client = redis.createClient();
 client.publish('__alfred_channel', 'Ready.');
 client.on('ready', () => {
@@ -260,7 +248,8 @@ client.on('message', (channel, message) => {
       const obj = JSON.parse(message);
       switch (obj.type) {
         case 'addService' :
-          sockets.push(createAPIServiceConnection(obj.name, 'ws://localhost:' + obj.port));
+          // TODO check if socket already present by name
+          createAPIServiceConnection(obj.name, 'ws://localhost:' + obj.port);
           break;
         default:
           log.info('unknow message type');
