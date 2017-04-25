@@ -1,20 +1,20 @@
 import * as amp from 'app-module-path';
 amp.addPath(__dirname);
 
-import {Request, Response}          from 'express-serve-static-core';
-import {Server as HttpServer}       from 'http';
-import {Server as HttpsServer}      from 'http';
-import {argv}                       from 'optimist';
-import * as bodyParser              from 'body-parser';
-import * as compression             from 'compression';
-import * as express                 from 'express';
-import * as fs                      from 'fs';
-import * as http                    from 'http';
-import * as https                   from 'https';
-import * as path                    from 'path';
+import {Request, Response}              from 'express-serve-static-core';
+import {Server as HttpServer}           from 'http';
+import {Server as HttpsServer}          from 'http';
+import {argv}                           from 'optimist';
+import * as bodyParser                  from 'body-parser';
+import * as compression                 from 'compression';
+import * as express                     from 'express';
+import * as fs                          from 'fs';
+import * as http                        from 'http';
+import * as https                       from 'https';
+import * as path                        from 'path';
 // import * as passport                from 'passport';
-import * as SwaggerExpress          from 'swagger-express-mw';
-import * as SwaggerUi               from 'swagger-tools/middleware/swagger-ui';
+import * as SwaggerExpress              from 'swagger-express-mw';
+import * as SwaggerUi                   from 'swagger-tools/middleware/swagger-ui';
 // import {adminRouter}                from 'admin-router';
 // import {StatusCode}                 from 'api/status-code';
 // import {passportConfig}             from 'auth/passport-config';
@@ -24,10 +24,11 @@ import * as SwaggerUi               from 'swagger-tools/middleware/swagger-ui';
 // import {sessionManager}             from 'session/session-manager-singleton';
 // import * as userController          from 'api/controllers/user';
 // import * as sessionMiddleware       from 'auth/session-middleware';
-import {ConfigInterface}            from 'conf/Config';
-import * as conf                    from 'conf/configuration';
+import {ConfigInterface}                from 'conf/Config';
+import * as conf                        from 'conf/configuration';
 // import * as contextMiddleware       from 'context/context-middleware';
-import * as logger                  from 'logger';
+import * as logger                      from 'logger';
+import {serviceSockets, AlfredService}  from 'singleton/service-sockets';
 
 
 const log = logger.child({from: 'app'});
@@ -185,62 +186,9 @@ export const startApp = (conf: ConfigInterface): Promise<HttpServer | HttpsServe
 };
 
 
-// Trying to connect to multiple ws server
 
-import * as WebSocket  from 'ws';
-import * as events from 'events';
+import * as redis         from 'redis';
 
-
-interface ServiceSocketInterface {
-  socket:     any;
-  service: string;
-}
-
-class SearchRequest {
-  uuid: any = "";
-  userId: number = 1;
-  pendingSubRequest: Array<ServiceSocket> = [];
-  eventEmitter: any = new events.EventEmitter();
-  ttl: Date = null;
-}
-
-const searchRequests = new Array<SearchRequest>();
-
-class ServiceSocket implements ServiceSocketInterface {
-  socket: any = null;
-  service: string = '';
-
-
-
-  constructor(socket: any, service: string) {
-    this.socket = socket;
-    this.service = service;
-  }
-}
-
-const sockets = new Array<ServiceSocket>();
-const eventEmitter = new events.EventEmitter();
-
-eventEmitter.on('socketMessageReceived', () => {
-
-});
-
-
-const createAPIServiceConnection = (service: string, url: string) : any => {
-  log.info('trying to connect to service: ' + service);
-  const socket = new WebSocket(url);
-  socket.on('open', function() : void {
-    log.info('connected on service: ' + service);
-    sockets.push(new ServiceSocket(socket, service));
-  });
-  socket.on('close', function() : void {
-    log.info('service: ' + service + ' lost');
-    // TODO remove from array of socket
-  });
-  return socket;
-};
-
-import * as redis  from 'redis';
 const client = redis.createClient();
 client.publish('__alfred_channel', 'Ready.');
 client.on('ready', () => {
@@ -253,7 +201,8 @@ client.on('message', (channel, message) => {
       switch (obj.type) {
         case 'addService' :
           // TODO check if socket already present by name
-          createAPIServiceConnection(obj.name, 'ws://localhost:' + obj.port);
+          serviceSockets.add(new AlfredService(obj.name, obj.host, obj.port, obj.version, obj.ws));
+
           break;
         default:
           log.info('unknow message type');

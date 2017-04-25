@@ -54,7 +54,7 @@ const proceedRequest = (message, uuid, ws) => {
     }
     
     try {
-        ws.send(response);
+        ws.send(JSON.stringify(response));
         console.log("-> ["+uuid+"] " + JSON.stringify(response));
     } catch (e) {
         console.log("<X> ERROR on send ["+uuid+"] " + JSON.stringify(response));
@@ -99,7 +99,7 @@ const startBinding = (server) => {
 
         ws.on('message', (message) => {
             try {
-                JSON.parse(message);
+                message = JSON.parse(message);
                 if (message.uuid) {
                     console.log("<- ["+message.uuid+"]" + message);
                     proceedRequest(message.txt, message.uuid, ws);
@@ -115,6 +115,7 @@ const startBinding = (server) => {
         c.publish('__services_channel', JSON.stringify({
             type:       'addService',
             name:       product.name,
+            host:       'localhost',
             ws:         true,
             port:       options.ports[index],
             version:    product.version
