@@ -200,9 +200,7 @@ client.on('message', (channel, message) => {
       const obj = JSON.parse(message);
       switch (obj.type) {
         case 'addService' :
-          // TODO check if socket already present by name
           serviceSockets.add(new AlfredService(obj.name, obj.host, obj.port, obj.version, obj.ws));
-
           break;
         default:
           log.info('unknow message type');
