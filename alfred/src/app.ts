@@ -176,7 +176,7 @@ export const startApp = (conf: ConfigInterface): Promise<HttpServer | HttpsServe
     let server = createServer(app, conf);
     let port = app.get('port');
 
-    server.listen(port, function (): void {
+    server.listen(port, "0.0.0.0", function (): void {
       log.info(`Server running on port ${port}.`);
     });
 
