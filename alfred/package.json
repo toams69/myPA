@@ -43,6 +43,7 @@
     "socket.io-client": "^1.7.3",
     "swagger-express-mw": "^0.7.0",
     "swagger-tools": "^0.10.1",
+    "twilio": "^3.0.0",
     "uuid": "^3.0.1"
   }
 }

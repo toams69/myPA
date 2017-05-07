@@ -29,6 +29,8 @@ import * as conf                        from 'conf/configuration';
 // import * as contextMiddleware       from 'context/context-middleware';
 import * as logger                      from 'logger';
 import {serviceSockets, AlfredService}  from 'singleton/service-sockets';
+// import * as twilio                      from 'twilio';
+
 
 
 const log = logger.child({from: 'app'});
@@ -55,6 +57,7 @@ const createExpressApp = (conf: ConfigInterface) => {
   const app = express();
   app.set('json spaces', 2);
   app.use(bodyParser.json({limit: '20mb'}));
+  app.use(bodyParser.urlencoded());
   // app.use(sessionMiddleware);
   // app.use('/alfred-api/*', metricsMiddleware);
   app.use(compression());
@@ -72,6 +75,19 @@ const createExpressApp = (conf: ConfigInterface) => {
     req.route = {path: req.path};
     next();
   });
+
+  // app.post('/twilio', twilio.webhook({validate: false}), function (req : Request, res: Response): void {
+  //   try {
+  //     log.info('[Twilio]' + ' => ' + JSON.stringify(req.body));
+  //   } catch (e) {
+  //     log.error('[Twilio]' + ' => ' + e);
+  //   }
+  //   let from = req.body.From;
+  //   let smsRequest = req.body.Body;
+  //   console.log(from);
+  //   console.log(smsRequest);
+  // });
+
 
 //   app.use(passport.initialize());
 //   app.use(passport.session());
@@ -176,7 +192,7 @@ export const startApp = (conf: ConfigInterface): Promise<HttpServer | HttpsServe
     let server = createServer(app, conf);
     let port = app.get('port');
 
-    server.listen(port, "0.0.0.0", function (): void {
+    server.listen(port, function (): void {
       log.info(`Server running on port ${port}.`);
     });
 

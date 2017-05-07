@@ -33,7 +33,6 @@ const controller = {
                 
                 data.lights.forEach((light) => {
                     if (light.state && light.state.reachable && !light.state.on) {
-                        console.log("ok "+ light.id);
                         api.setLightState(light.id, state.on());
                     }
                 });
@@ -47,7 +46,6 @@ const controller = {
             promise.then((data) => {
                 data.lights.forEach((light) => {
                     if (light.state && light.state.reachable && light.state.on) {
-                        console.log("ok "+ light.id);
                         api.setLightState(light.id, state.off());
                     }
                 });

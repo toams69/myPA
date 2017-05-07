@@ -2,7 +2,10 @@
     {
         "operationId": "setLightsOn",
         "requests": [
-            "Allume les lumière"
+            "Allumes les lumières",
+            "Allumes tout",
+            "Allumes la maison",
+            "Eclaire moi"
         ],
         "answers": [
             "Et la lumière fut"
@@ -11,7 +14,10 @@
     {
         "operationId": "setLightsOff",
         "requests": [
-            "Eteind les lumière"
+            "Eteinds les lumières",
+            "Eteinds la maison",
+            "Je pars",
+            "Eteinds tout"
         ],
         "answers": [
             "Bonne nuit ?"

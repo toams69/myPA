@@ -53,8 +53,40 @@ paths:
           description: Request failed.
           schema:
             $ref: '#/definitions/apiErrorResponse'
+  /sms:
+    post:
+      consumes:
+        - application/x-www-form-urlencoded
+      x-swagger-router-controller: twilio
+      operationId: proceedSMS
+      tags: ['twilio']
+      summary: Handle a message and try to help the user
+      parameters:
+        - name: parameters
+          in: body
+          description: Request parameters.
+          required: true
+          schema:
+            required:
+              - Body
+            properties:
+              Body:
+                type: string
+                description: On success will have a vaue of zero.
+              From:
+                type: string
+                description: On success will have a vaue of zero.
+      responses:
+        200: 
+          description: Request succeeded.
+          schema:
+            $ref: '#/definitions/apiSuccessResponse'
+        500:
+          description: Request failed.
+          schema:
+            $ref: '#/definitions/apiErrorResponse'
             
-definitions:    
+definitions:
   apiSuccessResponse:
     type: object
     required:
