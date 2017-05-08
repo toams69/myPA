@@ -26,11 +26,46 @@ paths:
           description: Request failed.
           schema:
             $ref: '#/definitions/apiErrorResponse'
+
+  /services:
+    get:
+      x-swagger-router-controller: user
+      tags: ['alfred']
+      summary: get all the services connected to alfred.
+      description: |
+        This request returns all services currently attached to alfred.
+      responses:
+        200:
+         description: Request succeeded.
+         schema:
+            $ref: '#/definitions/apiSuccessResponse'
+        500:
+          description: Request failed.
+          schema:
+            $ref: '#/definitions/apiErrorResponse'
+
+  /state:
+    get:
+      x-swagger-router-controller: user
+      tags: ['alfred']
+      summary: get the global status of alfred.
+      description: |
+        This request returns all system information including services system info.
+      responses:
+        200:
+         description: Request succeeded.
+         schema:
+            $ref: '#/definitions/apiSuccessResponse'
+        500:
+          description: Request failed.
+          schema:
+            $ref: '#/definitions/apiErrorResponse'           
+
   /message:
     post:
       x-swagger-router-controller: message
       operationId: proceedMessage
-      tags: ['message']
+      tags: ['alfred']
       summary: Handle a message and try to help the user
       
       parameters:

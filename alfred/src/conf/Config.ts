@@ -9,12 +9,7 @@ import * as logger    from 'logger';
 const log = logger.child({from: 'Config'});
 
 type sectionName = 
-    'admin' 
-  | 'common' 
-  | 'cors' 
-  | 'logging' 
-  | 'services' 
-  | 'session' 
+  'cors' 
   | 'server'
   | 'socket-io';
 
@@ -83,50 +78,7 @@ class Config implements ConfigInterface {
   }
 
   get corsAllowedOrigins(): string {
-    // TODO (shabunc): do we need both enableCors and corsAllowedOrigins? Also, may be we should return array here
     return this.getFromEnvOrConfig('ALFRED_CORS_ALLOWED_ORIGINS', ['cors', 'allowedOrigins']);
-  }
-
-  get adminUsername(): string {
-    return this.getFromEnvOrConfig('ALFRED_ADMIN_USERNAME', ['admin', 'username']);
-  }
-
-  get adminPassword(): string {
-    return this.getFromEnvOrConfig('ALFRED_ADMIN_PASSWORD', ['admin', 'password']);
-  }
-
-  get clientId(): string {
-    return this.getFromEnvOrConfig('ALFRED_COMMON_CLIENT_ID', ['common', 'clientId']);
-  }
-
-  get clientSecret(): string {
-    return this.getFromEnvOrConfig('ALFRED_COMMON_CLIENT_SECRET', ['common', 'clientSecret']);
-  }
-
-  get authUri(): string {
-    return this.getFromEnvOrConfig('ALFRED_SERVICES_AUTH', ['services', 'auth']);
-  }
-
-  get cleanupDelay(): number {
-    return parseInt(this.getFromEnvOrConfig('ALFRED_SESSION_CLEANUP_DELAY', ['session', 'cleanupDelay']));
-  }
-
-  get cleanupInterval(): number {
-    return parseInt(this.getFromEnvOrConfig('ALFRED_SESSION_CLEANUP_INTERVAL', ['session', 'cleanupInterval']));
-  }
-
-  get connectionRecordTTL(): number {
-    return parseInt(this.getFromEnvOrConfig('ALFRED_SESSION_CONNECTION_RECORD_TTL', ['session', 'connectionRecordTTL']));
-  }
-
-  get connectionRecordRefreshInterval(): number {
-    return parseInt(this.getFromEnvOrConfig('ALFRED_SESSION_CONNECTION_RECORD_RERFRESH_INTERVAL', 
-      ['session', 'connectionRecordRefreshInterval']));
-  }
-
-  get enableCleanup(): boolean {
-    let rawVal = this.getFromEnvOrConfig('ALFRED_SESSION_ENABLE_CLEANUP', ['session', 'enableCleanup']);
-    return String(rawVal) === 'true';
   }
 
   get enableCors(): boolean {
@@ -174,32 +126,12 @@ class Config implements ConfigInterface {
     let msg = '';
     msg += 'Server Configuration:\n';
     msg += '[=-----------------------------------------------------------------------=]\n';
-    msg += ` ${padRight('ALFRED_ADMIN_USERNAME', width)}` +
-       `=> ${this.adminUsername}\n`;
-    msg += ` ${padRight('ALFRED_ADMIN_PASSWORD', width)}` +
-       `=> ${this.adminPassword}\n`;
     msg += ` ${padRight('ALFRED_CORS_ENABLE', width)}` + 
       `=> ${this.enableCors}\n`;
     msg += ` ${padRight('ALFRED_CORS_ALLOWED_ORIGINS', width)}` +
        `=> ${this.corsAllowedOrigins}\n`;
-    msg += ` ${padRight('ALFRED_COMMON_CLIENT_ID', width)}` +
-       `=> ${this.clientId}\n`;
-    msg += ` ${padRight('ALFRED_COMMON_CLIENT_SECRET', width)}` +
-       `=> *****\n`;
-    msg += ` ${padRight('ALFRED_SERVICES_AUTH', width)}` +
-       `=> ${this.authUri}\n`;
     msg += ` ${padRight('ALFRED_SERVER_PORT', width)}` +
        `=> ${this.serverPort}\n`;
-    msg += ` ${padRight('ALFRED_SESSION_ENABLE_CLEANUP', width)}` +
-       `=> ${this.enableCleanup}\n`;
-    msg += ` ${padRight('ALFRED_SESSION_CLEANUP_DELAY', width)}` +
-       `=> ${this.cleanupDelay || '-'}\n`;
-    msg += ` ${padRight('ALFRED_SESSION_CLEANUP_INTERVAL', width)}` +
-       `=> ${this.cleanupInterval || '-'}\n`;
-    msg += ` ${padRight('ALFRED_SESSION_CONNECTION_RECORD_TTL', width)}` +
-       `=> ${this.connectionRecordTTL || '-'}\n`;
-    msg += ` ${padRight('ALFRED_SESSION_CONNECTION_RECORD_RERFRESH_INTERVAL', width)}` +
-       `=> ${this.connectionRecordRefreshInterval || '-'}\n`;
     msg += '[=-----------------------------------------------------------------------=]';
     log.debug(msg);
   }

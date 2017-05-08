@@ -1,6 +1,5 @@
 import * as amp from 'app-module-path';
 amp.addPath(__dirname);
-
 import {Request, Response}              from 'express-serve-static-core';
 import {Server as HttpServer}           from 'http';
 import {Server as HttpsServer}          from 'http';
@@ -12,29 +11,15 @@ import * as fs                          from 'fs';
 import * as http                        from 'http';
 import * as https                       from 'https';
 import * as path                        from 'path';
-// import * as passport                from 'passport';
 import * as SwaggerExpress              from 'swagger-express-mw';
 import * as SwaggerUi                   from 'swagger-tools/middleware/swagger-ui';
-// import {adminRouter}                from 'admin-router';
-// import {StatusCode}                 from 'api/status-code';
-// import {passportConfig}             from 'auth/passport-config';
-// import {contextManager}             from 'context/context-manager';
-// import {expressMiddleware as zkm}   from 'expressMiddleware';
-// import {metricsMiddleware}          from 'metrics/request-metrics';
-// import {sessionManager}             from 'session/session-manager-singleton';
-// import * as userController          from 'api/controllers/user';
-// import * as sessionMiddleware       from 'auth/session-middleware';
 import {ConfigInterface}                from 'conf/Config';
 import * as conf                        from 'conf/configuration';
-// import * as contextMiddleware       from 'context/context-middleware';
 import * as logger                      from 'logger';
 import {serviceSockets, AlfredService}  from 'singleton/service-sockets';
-// import * as twilio                      from 'twilio';
-
 
 
 const log = logger.child({from: 'app'});
-// passportConfig(passport);
 
 const getBuildInfo = () => {
   let buildInfo = {
@@ -58,8 +43,6 @@ const createExpressApp = (conf: ConfigInterface) => {
   app.set('json spaces', 2);
   app.use(bodyParser.json({limit: '20mb'}));
   app.use(bodyParser.urlencoded());
-  // app.use(sessionMiddleware);
-  // app.use('/alfred-api/*', metricsMiddleware);
   app.use(compression());
 
   if (conf.enableCors && conf.corsAllowedOrigins) {
@@ -76,35 +59,10 @@ const createExpressApp = (conf: ConfigInterface) => {
     next();
   });
 
-  // app.post('/twilio', twilio.webhook({validate: false}), function (req : Request, res: Response): void {
-  //   try {
-  //     log.info('[Twilio]' + ' => ' + JSON.stringify(req.body));
-  //   } catch (e) {
-  //     log.error('[Twilio]' + ' => ' + e);
-  //   }
-  //   let from = req.body.From;
-  //   let smsRequest = req.body.Body;
-  //   console.log(from);
-  //   console.log(smsRequest);
-  // });
-
-
-//   app.use(passport.initialize());
-//   app.use(passport.session());
-//   app.use(contextMiddleware);
-
-//   contextManager.initialize();
-//   sessionManager.initialize();
-
-  const port = conf.serverPort;
-  
-  app.set('port', port);
-
+  app.set('port', conf.serverPort);
   app.set('etag', false);
   app.set('x-powered-by', false);
 
-//   app.use('/alfred-api/login', userController.login);
-  
   app.use('/alfred-api/*', (request: Request, response: Response, next: (err?: any) => void) => {
     let baseUrl = request.baseUrl;
     if (baseUrl.startsWith('/alfred-api/explore') 
@@ -114,13 +72,6 @@ const createExpressApp = (conf: ConfigInterface) => {
     } else if (request.method === 'OPTIONS') {
       response.end();
     } else {
-    //   if (!request.session.loginData || !request.session.loginData.access_token) {
-    //     let json = { status: { code: StatusCode.Forbidden, message: 'Unauthorized'}};
-    //     response.apiError = json;
-    //     response.status(403).json(json);
-    //     return;
-    //   }
-
       next();
     }
   });
@@ -202,7 +153,7 @@ export const startApp = (conf: ConfigInterface): Promise<HttpServer | HttpsServe
 };
 
 
-
+// Redis connection and service discovery
 import * as redis         from 'redis';
 
 const client = redis.createClient();

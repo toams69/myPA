@@ -1,4 +1,3 @@
-
 import * as logger      from 'logger';
 import * as WebSocket   from 'ws';
 import * as events 		from 'events';
@@ -149,8 +148,3 @@ export const serviceSockets = {
 		});
     }
 };
-
-/*
- log.info('[' + sR.uuid + ']' + '=> ' + JSON.stringify(answer));
-            response.json(answer);
-*/
