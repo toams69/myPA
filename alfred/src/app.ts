@@ -177,6 +177,8 @@ client.on('message', (channel, message) => {
     }
 });
 
+// Create WS server for UI 
+
 
 if (require.main === module) {
   startApp(conf);

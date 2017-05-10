@@ -4,6 +4,7 @@ import Vue from 'vue'
 import App from './App'
 import router from './router'
 import VueMaterial from 'vue-material'
+import store from './vuex/store'
 
 Vue.config.productionTip = false
 
@@ -15,7 +16,8 @@ Vue.material.registerTheme('default', {
 
 /* eslint-disable no-new */
 new Vue({
-  el: '#app',
+  store,
+  el: '#app', 
   router,
   template: '<App/>',
   components: { App }

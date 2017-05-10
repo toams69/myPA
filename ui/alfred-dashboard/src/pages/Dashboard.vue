@@ -30,7 +30,7 @@
         </md-card-area>
 
         <md-card-content>
-            Content to replace
+            <services-manager></services-manager>
         </md-card-content>
     </md-card>
     <md-card class="card">
@@ -73,6 +73,7 @@
 </template>
 
 <script>
+import ServicesManager from '@/components/ServicesManager'
 export default {
   name: 'dashboard',
   methods: {
@@ -85,6 +86,9 @@ export default {
     closeRightSidenav() {
       this.$refs.rightSidenav.close();
     }
+  },
+  components: {
+    ServicesManager
   },
   data () {
     return {
