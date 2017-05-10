@@ -1,13 +1,24 @@
+#!/usr/bin/env node
 const WebSocketServer   = require('ws').Server;
+const program           = require('commander');
 const fs                = require('fs');
 const path              = require('path');
-const controller        = require('./controller');
 const product           = require('./package.json');
 const redis             = require('redis');
 
 const options = {
     ports: [3000, 3001, 3002]
 };
+
+program
+  .version(product.version)
+  .option('-p, --ports <items>', 'Add ports')
+  .parse(process.argv);
+
+var basedir = process.cwd();
+
+const controller = require(path.resolve(basedir, './controller'));
+const service = require(path.resolve(basedir, './package.json'));
 
 var walk = function(dir, filelist) {
 	const files = fs.readdirSync(dir);
@@ -24,7 +35,7 @@ var walk = function(dir, filelist) {
 };
 
 const parsers = [];
-walk(path.resolve(__dirname, './parsers')).forEach((parser) => {
+walk(path.resolve(basedir, './parsers')).forEach((parser) => {
     parsers.push(require(parser));
 });
 
@@ -136,11 +147,11 @@ const startBinding = (server) => {
         console.log('-> publish service to redis');
         c.publish('__services_channel', JSON.stringify({
             type:       'addService',
-            name:       product.name,
+            name:       service.name,
             host:       'localhost',
             ws:         true,
             port:       options.ports[index],
-            version:    product.version
+            version:    service.version
         }));
         c.quit();
     };

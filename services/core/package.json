@@ -1,0 +1,21 @@
+{
+  "name": "alfred-service",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": "7.4.0",
+    "npm": "4.0.5"
+  },
+  "bin": {
+    "alfred-service": "./server.js"
+  },
+  "devDependencies": {},
+  "dependencies": {
+    "commander": "^2.9.0",
+    "redis": "^2.7.1",
+    "ws": "^1.1.1"
+  }
+}
