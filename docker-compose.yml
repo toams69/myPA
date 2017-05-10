@@ -1,0 +1,78 @@
+##################################################################################
+## 
+## VERSION      :   0.0.1
+## DATE         :   10/10/2016
+## AUTHOR       :   Thomas Pariaud
+## DESCRIPTION  :   ""
+##
+##################################################################################
+
+version: '2'
+services:
+  redis:
+    image: redis
+    ports:
+        - "6379"
+
+  dbdata:
+    image: mongo
+    volumes:
+      - /data/db:/data/db
+    command: --break-mongo
+
+  db:
+    image: mongo
+    ports:
+      - "27017:27017"
+    volumes_from:
+      - dbdata
+    command: --smallfiles --rest
+  
+  alfred:
+    build: ./alfred/
+    container_name: alfred
+    volumes:
+      - ./alfred:/app
+    ports:
+      - "2104:2104"
+    links:
+      - db
+      - redis
+    environment:
+      - PORT=5555
+      - DB=alfred
+      - DB_HOST=db
+      - DB_PORT=27017
+      - DB_URL=mongodb://db:27017/alfred
+      - DB_USERNAME=admin
+      - DB_PASSWORD=admin
+      - JWT_TOKEN=alfredJWTToken
+
+  dashboard:
+    build: ./ui/alfred-dashboard/
+    container_name: webapp
+    volumes:
+      - ./ui/alfred-dashboard:/app
+    ports:
+      - "2104:2104"
+    depends_on:
+      - alfred
+    environment:
+      - ALFRED_URL=http://alfred:5555
+  
+  nginx:
+    image: nginx:1.10.1
+    container_name: nginx
+    depends_on:
+      - dashboard
+      - alfred
+    volumes:
+      - ./nginx.conf.template:/etc/nginx/nginx.conf.template
+    ports:
+      - "80:80"
+    environment:
+      - NGINX_HOST=nginx
+      - NGINX_PORT=80
+      - DASHBOARD=http://dashboard:2104/
+      - ALFRED=http://alfred:5555/
+    command: /bin/bash -c "envsubst < /etc/nginx/nginx.conf.template > /etc/nginx/nginx.conf && nginx -g 'daemon off;'"
