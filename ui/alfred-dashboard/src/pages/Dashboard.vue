@@ -15,24 +15,7 @@
         </md-toolbar>
         <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Nisi cupiditate esse necessitatibus beatae nobis, deserunt ut est fugit, tempora deleniti, eligendi commodi doloribus. Nemo, assumenda possimus, impedit inventore perferendis iusto!</p>
     </md-sidenav>
-    <md-card class="card">
-        <md-card-area md-inset>
-            <md-card-header>
-                <h2 class="md-title">Services Available</h2>
-                <div class="md-subhead">
-                    
-                </div>
-            </md-card-header>
-
-            <md-card-content>
-                This represents all services currently connected to Alfred
-            </md-card-content>
-        </md-card-area>
-
-        <md-card-content>
-            <services-manager></services-manager>
-        </md-card-content>
-    </md-card>
+    <services-manager></services-manager>
     <md-card class="card">
         <md-card-area md-inset>
             <md-card-header>
